@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import './constants.dart';
 import './screens/homeScreen.dart';
+import '../controllers/menuController.dart';
 
 class MyApp extends StatefulWidget {
   @override
@@ -12,18 +14,23 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Admin Panel",
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: bgColor,
-        textTheme:
-            GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(
-          bodyColor: Colors.white,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MenuController(),),
+      ],
+      child: MaterialApp(
+        title: "Admin Panel",
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark().copyWith(
+          scaffoldBackgroundColor: bgColor,
+          textTheme:
+              GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme).apply(
+            bodyColor: Colors.white,
+          ),
+          canvasColor: secondaryColor,
         ),
-        canvasColor: secondaryColor,
+        home: AdminPanel(),
       ),
-      home: AdminPanel(),
     );
   }
 }

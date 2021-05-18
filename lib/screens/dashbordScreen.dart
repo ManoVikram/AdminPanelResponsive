@@ -1,3 +1,4 @@
+import 'package:admin_panel/responsive.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,9 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import '../constants.dart';
 import '../widgets/header.dart';
 import '../widgets/storageDetails.dart';
-import '../widgets/chart.dart';
-import '../widgets/storageInfoCard.dart';
 import '../widgets/myFiles.dart';
+import '../models/recentFiles.dart';
 
 class DashboardScreen extends StatelessWidget {
   @override
@@ -45,6 +45,35 @@ class DashboardScreen extends StatelessWidget {
       ),
     ];
 
+    DataRow recentFilesRow(RecentFile recentFileInfo) {
+      return DataRow(
+        cells: [
+          DataCell(
+            Row(
+              children: [
+                SvgPicture.asset(
+                  recentFileInfo.icon,
+                  height: 30,
+                  width: 30,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: defaultPadding),
+                  child: Text(recentFileInfo.title),
+                ),
+              ],
+            ),
+          ),
+          DataCell(
+            Text(recentFileInfo.date),
+          ),
+          DataCell(
+            Text(recentFileInfo.size),
+          ),
+        ],
+      );
+    }
+
     return SafeArea(
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -60,16 +89,77 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Expanded(
                   flex: 5,
-                  child: MyFiles(),
+                  child: Column(
+                    children: [
+                      MyFiles(),
+                      SizedBox(
+                        height: defaultPadding,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(defaultPadding),
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(10.0),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Recent Files",
+                              style: Theme.of(context).textTheme.subtitle1,
+                            ),
+                            SizedBox(
+                              width: double.infinity,
+                              // DataTable() creates table of rows and columns
+                              child: DataTable(
+                                horizontalMargin: 0.0,
+                                columnSpacing: defaultPadding,
+                                columns: [
+                                  DataColumn(
+                                    label: Text("File Name"),
+                                  ),
+                                  DataColumn(
+                                    label: Text("Date"),
+                                  ),
+                                  DataColumn(
+                                    label: Text("Size"),
+                                  ),
+                                ],
+                                // List.generate() generates a list of data
+                                rows: List.generate(
+                                  recentFiles.length,
+                                  (index) => recentFilesRow(
+                                    recentFiles[index],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (Responsive.isMobile(context))
+                        SizedBox(
+                          height: defaultPadding,
+                        ),
+                      if (Responsive.isMobile(context))
+                        StorageDetails(
+                            pieChartSectionDataList: pieChartSectionDataList),
+                    ],
+                  ),
                 ),
+                if (!Responsive.isMobile(context))
                 SizedBox(
                   width: defaultPadding,
                 ),
-                Expanded(
-                  flex: 2,
-                  child: StorageDetails(
-                      pieChartSectionDataList: pieChartSectionDataList),
-                ),
+                // StorgeDetails() will not be shown on mobile screens
+                if (!Responsive.isMobile(context))
+                  Expanded(
+                    flex: 2,
+                    child: StorageDetails(
+                        pieChartSectionDataList: pieChartSectionDataList),
+                  ),
               ],
             ),
           ],
@@ -78,5 +168,3 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
-
-
